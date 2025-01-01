@@ -30,6 +30,12 @@ fun main() {
         println("  Constant pool item $itemIndex")
         readConstantPoolEntry(source)
     }
+
+    val accessFlags = source.readUShort()
+    println("Access flags: $accessFlags")
+
+    val thisClass = source.readUShort()
+    println("This class: $thisClass")
 }
 
 private fun readConstantPoolEntry(source: Source) {
