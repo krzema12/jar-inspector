@@ -52,27 +52,41 @@ fun main() {
     }
 
     val fieldsCount = source.readUShort()
-    println("Fields count: $fieldsCount")
-
-    repeat(fieldsCount.toInt()) { itemIndex ->
-        println("  Field $itemIndex")
-        readFieldInfo(source)
+    val fields = buildList {
+        repeat(fieldsCount.toInt()) {
+            add(readFieldInfo(source))
+        }
+    }
+    println()
+    println("Fields")
+    fields.forEachIndexed { index, item ->
+        println("${(constantPool[item.nameIndex - 1] as Utf8).string} - $index: $item")
     }
 
     val methodsCount = source.readUShort()
-    println("Methods count: $methodsCount")
+    val methods = buildList {
+        repeat(methodsCount.toInt()) {
+            add(readMethodInfo(source))
+        }
+    }
 
-    repeat(methodsCount.toInt()) { itemIndex ->
-        println("  Method $itemIndex")
-        readMethodInfo(source)
+    println()
+    println("Methods")
+    methods.forEachIndexed { index, item ->
+        println("${(constantPool[item.nameIndex - 1] as Utf8).string} - $index: $item")
     }
 
     val attributesCount = source.readUShort()
-    println("Attributes count: $attributesCount")
+    val attributes = buildList {
+        repeat(attributesCount.toInt()) {
+            add(readAttributeInfo(source))
+        }
+    }
 
-    repeat(attributesCount.toInt()) { itemIndex ->
-        println("  Attribute $itemIndex")
-        readAttributeInfo(source)
+    println()
+    println("Attributes")
+    attributes.forEachIndexed { index, item ->
+        println("${(constantPool[item.attributeNameIndex - 1] as Utf8).string} - $index: $item")
     }
 
     require(source.exhausted()) {
