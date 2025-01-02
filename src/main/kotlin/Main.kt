@@ -1,5 +1,7 @@
 package it.krzeminski
 
+import it.krzeminski.internal.*
+import it.krzeminski.internal.String
 import kotlinx.io.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -21,9 +23,14 @@ fun main() {
     val constantPoolCount = source.readUShort()
     println("Constant pool count: $constantPoolCount")
 
-    repeat(constantPoolCount.toInt() - 1) { itemIndex ->
-        println("  Constant pool item $itemIndex")
-        readConstantPoolEntry(source)
+    val constantPool = buildList {
+        repeat(constantPoolCount.toInt() - 1) {
+            add(readConstantPoolEntry(source))
+        }
+    }
+    println("Constant pool")
+    constantPool.forEachIndexed { index, item ->
+        println("$index: $item")
     }
 
     val accessFlags = source.readUShort()
@@ -73,11 +80,8 @@ fun main() {
     }
 }
 
-private fun readConstantPoolEntry(source: Source) {
-    val tag = source.readUByte().toInt()
-    print("    Tag: $tag - ")
-
-    when (tag) {
+private fun readConstantPoolEntry(source: Source): ConstantPoolStruct {
+    return when (val tag = source.readUByte().toInt()) {
         1 -> readUtf8Info(source)
         3 -> readInteger(source)
         7 -> readClass(source)
@@ -90,96 +94,113 @@ private fun readConstantPoolEntry(source: Source) {
     }
 }
 
-private fun readUtf8Info(source: Source) {
-    println("UTF-8")
+private fun readUtf8Info(source: Source): Utf8 {
     val length = source.readUShort()
     val string = source.readString(length.toLong())
-    println("    String: $string")
+    return Utf8(
+        string=string,
+    )
 }
 
-private fun readInteger(source: Source) {
-    println("Integer")
+private fun readInteger(source: Source): Integer {
     val value = source.readInt()
-    println("    Value: $value")
+    return Integer(
+        value = value,
+    )
 }
 
-private fun readClass(source: Source) {
-    println("Class")
+private fun readClass(source: Source): Class {
     val nameIndex = source.readUShort().toInt()
-    println("    Name index: $nameIndex")
+    return Class(
+        nameIndex = nameIndex,
+    )
 }
 
-private fun readString(source: Source) {
-    println("String")
+private fun readString(source: Source): String {
     val stringIndex = source.readUShort().toInt()
-    println("    String index: $stringIndex")
+    return String(
+       stringIndex = stringIndex,
+    )
 }
 
-private fun readFieldref(source: Source) {
-    println("Fieldref")
-    val classIndex = source.readUShort()
-    println("    Class index: $classIndex")
-    val nameAndTypeIndex = source.readUShort()
-    println("    NameAndType index: $nameAndTypeIndex")
-}
-
-private fun readMethodref(source: Source) {
-    println("Method ref")
+private fun readFieldref(source: Source): Fieldref {
     val classIndex = source.readUShort().toInt()
     val nameAndTypeIndex = source.readUShort().toInt()
-    println("    Class index: $classIndex, name and type index: $nameAndTypeIndex")
+    return Fieldref(
+        classIndex = classIndex,
+        nameAndTypeIndex = nameAndTypeIndex,
+    )
 }
 
-private fun readInterfaceMethodref(source: Source) {
-    println("Interface method ref")
+private fun readMethodref(source: Source): Methodref {
     val classIndex = source.readUShort().toInt()
     val nameAndTypeIndex = source.readUShort().toInt()
-    println("    Class index: $classIndex, name and type index: $nameAndTypeIndex")
+    return Methodref(
+        classIndex = classIndex,
+        nameAndTypeIndex = nameAndTypeIndex,
+    )
 }
 
-private fun readNameAndType(source: Source) {
-    println("Name and type")
+private fun readInterfaceMethodref(source: Source): InterfaceMethodref {
+    val classIndex = source.readUShort().toInt()
+    val nameAndTypeIndex = source.readUShort().toInt()
+    return InterfaceMethodref(
+        classIndex = classIndex,
+        nameAndTypeIndex = nameAndTypeIndex,
+    )
+}
+
+private fun readNameAndType(source: Source): NameAndType {
     val nameIndex = source.readUShort().toInt()
     val descriptorIndex = source.readUShort().toInt()
-    println("    Name index: $nameIndex, descriptor index: $descriptorIndex")
+    return NameAndType(
+        nameIndex = nameIndex,
+        descriptorIndex = descriptorIndex,
+    )
 }
 
-private fun readFieldInfo(source: Source) {
-    val accessFlags = source.readUShort()
-    println("    Access flags: $accessFlags")
-    val nameIndex = source.readUShort()
-    println("    Name index: $nameIndex")
-    val descriptorIndex = source.readUShort()
-    println("    Descriptor index: $descriptorIndex")
+private fun readFieldInfo(source: Source): FieldInfo {
+    val accessFlags = source.readUShort().toInt()
+    val nameIndex = source.readUShort().toInt()
+    val descriptorIndex = source.readUShort().toInt()
     val attributesCount = source.readUShort()
-    println("    Attributes count: $attributesCount")
-
-    repeat(attributesCount.toInt()) { itemIndex ->
-        println("    Attribute $itemIndex")
-        readAttributeInfo(source)
+    val attributes = buildList {
+        repeat(attributesCount.toInt()) {
+            add(readAttributeInfo(source))
+        }
     }
+    return FieldInfo(
+        accessFlags = accessFlags,
+        nameIndex = nameIndex,
+        descriptorIndex = descriptorIndex,
+        attributes = attributes,
+    )
 }
 
-fun readAttributeInfo(source: Source) {
-    val attributeNameIndex = source.readUShort()
-    println("      Attribute name index: $attributeNameIndex")
+fun readAttributeInfo(source: Source): AttributeInfo {
+    val attributeNameIndex = source.readUShort().toInt()
     val attributeLength = source.readUInt()
-    println("      Attribute length: $attributeLength")
     val info = source.readByteArray(attributeLength.toInt())
-    println("      Info: (binary: ${info.size})")
+    return AttributeInfo(
+        attributeNameIndex = attributeNameIndex,
+        info = info,
+    )
 }
 
-fun readMethodInfo(source: Source) {
-    val accessFlags = source.readUShort()
-    println("    Access flags: $accessFlags")
-    val nameIndex = source.readUShort()
-    println("    Name index: $nameIndex")
-    val descriptorIndex = source.readUShort()
-    println("    Descriptor index: $descriptorIndex")
+fun readMethodInfo(source: Source): MethodInfo {
+    val accessFlags = source.readUShort().toInt()
+    val nameIndex = source.readUShort().toInt()
+    val descriptorIndex = source.readUShort().toInt()
     val attributesCount = source.readUShort()
-    println("    Attributes count: $attributesCount")
-    repeat(attributesCount.toInt()) { itemIndex ->
-        println("    Attribute $itemIndex")
-        readAttributeInfo(source)
+    val attributes = buildList {
+        repeat(attributesCount.toInt()) {
+            add(readAttributeInfo(source))
+        }
     }
+    return MethodInfo(
+        accessFlags = accessFlags,
+        nameIndex = nameIndex,
+        descriptorIndex = descriptorIndex,
+        attributes = attributes,
+    )
 }
