@@ -1,54 +1,45 @@
 package it.krzeminski
 
+import io.exoquery.pprint
 import it.krzeminski.internal.*
 import it.krzeminski.internal.String
 import kotlinx.io.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 
-@OptIn(ExperimentalStdlibApi::class)
 fun main() {
-    println("Reading a class file")
     val classFileToRead = Path("test-module-to-inspect/build/classes/kotlin/main/SomeClass.class")
     val source = SystemFileSystem.source(classFileToRead).buffered()
 
+    val classFile = readClassFile(source = source)
+    println(pprint(classFile, defaultHeight = 1000))
+}
+
+fun readClassFile(source: Source): ClassFile {
     // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
     val magic = source.readUInt()
-    println("Magic: ${magic.toHexString()}")
+    require(magic == 0xCAFEBABE.toUInt()) { "Magic is invalid: $magic" }
 
     val minorVersion = source.readUShort()
     val majorVersion = source.readUShort()
-    println("Version: $majorVersion.$minorVersion")
 
     val constantPoolCount = source.readUShort()
-    println("Constant pool count: $constantPoolCount")
 
     val constantPool = buildList {
         repeat(constantPoolCount.toInt() - 1) {
             add(readConstantPoolEntry(source))
         }
     }
-    println("Constant pool")
-    constantPool.forEachIndexed { index, item ->
-        println("$index: $item")
-    }
 
     val accessFlags = source.readUShort()
-    println("Access flags: $accessFlags")
-
     val thisClass = source.readUShort()
-    println("This class: $thisClass")
-
     val superclass = source.readUShort()
-    println("Super class: $superclass")
 
     val interfacesCount = source.readUShort()
-    println("Interfaces count: $interfacesCount")
-
-    repeat(interfacesCount.toInt()) { itemIndex ->
-        println("  Interface $itemIndex")
-        val interfaceRef = source.readUShort()
-        println("    Interface ref: $interfaceRef")
+    val interfaces = buildList {
+        repeat(interfacesCount.toInt()) {
+            add(source.readUShort())
+        }
     }
 
     val fieldsCount = source.readUShort()
@@ -56,11 +47,6 @@ fun main() {
         repeat(fieldsCount.toInt()) {
             add(readFieldInfo(source))
         }
-    }
-    println()
-    println("Fields")
-    fields.forEachIndexed { index, item ->
-        println("${(constantPool[item.nameIndex - 1] as Utf8).string} - $index: $item")
     }
 
     val methodsCount = source.readUShort()
@@ -70,12 +56,6 @@ fun main() {
         }
     }
 
-    println()
-    println("Methods")
-    methods.forEachIndexed { index, item ->
-        println("${(constantPool[item.nameIndex - 1] as Utf8).string} - $index: $item")
-    }
-
     val attributesCount = source.readUShort()
     val attributes = buildList {
         repeat(attributesCount.toInt()) {
@@ -83,15 +63,22 @@ fun main() {
         }
     }
 
-    println()
-    println("Attributes")
-    attributes.forEachIndexed { index, item ->
-        println("${(constantPool[item.attributeNameIndex - 1] as Utf8).string} - $index: $item")
-    }
-
     require(source.exhausted()) {
         "There's still some data to read!"
     }
+
+    return ClassFile(
+        majorVersion = majorVersion,
+        minorVersion = minorVersion,
+        constantPool = constantPool,
+        accessFlags = accessFlags,
+        thisClass = thisClass,
+        superclass = superclass,
+        interfaces = interfaces,
+        fields = fields,
+        methods = methods,
+        attributes = attributes,
+    )
 }
 
 private fun readConstantPoolEntry(source: Source): ConstantPoolStruct {

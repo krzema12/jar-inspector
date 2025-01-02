@@ -11,4 +11,5 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.6.0")
+    implementation("io.exoquery:pprint-kotlin:2.0.2")
 }
