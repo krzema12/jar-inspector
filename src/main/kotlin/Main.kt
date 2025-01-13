@@ -13,6 +13,32 @@ fun main() {
 
     val classFile = readClassFile(source = source)
     println(pprint(classFile, defaultHeight = 1000))
+
+    val runtimeVisibleAnnotations = classFile.attributes.find { attribute ->
+        (classFile.constantPool[attribute.attributeNameIndex - 1] as Utf8).string == "RuntimeVisibleAnnotations"
+    } ?: error("Not found!")
+
+    val infoBuffer = Buffer().apply { write(runtimeVisibleAnnotations.info) }
+    infoBuffer.readUShort() // Unknown
+    val nameIndex = infoBuffer.readUShort().toInt()
+    println("Name: ${(classFile.constantPool[nameIndex - 1] as Utf8).string}")
+    val noOfArguments = infoBuffer.readUShort().toInt()
+    println("Number of arguments: $noOfArguments")
+
+    val argNameIndex = infoBuffer.readUShort().toInt()
+    println("Name: ${(classFile.constantPool[argNameIndex - 1] as Utf8).string}")
+    infoBuffer.readByte() // Unknown
+    val noOfArrayItems = infoBuffer.readUShort().toInt()
+    println("Number of array items: $noOfArrayItems")
+    infoBuffer.readByte() // Unknown
+    val arrayNameIndex1 = infoBuffer.readUShort().toInt()
+    println("Arg1: ${(classFile.constantPool[arrayNameIndex1 - 1] as Integer).value}")
+    infoBuffer.readByte() // Unknown
+    val arrayNameIndex2 = infoBuffer.readUShort().toInt()
+    println("Arg2: ${(classFile.constantPool[arrayNameIndex2 - 1] as Integer).value}")
+    infoBuffer.readByte() // Unknown
+    val arrayNameIndex3 = infoBuffer.readUShort().toInt()
+    println("Arg3: ${(classFile.constantPool[arrayNameIndex3 - 1] as Integer).value}")
 }
 
 fun readClassFile(source: Source): ClassFile {
