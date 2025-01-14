@@ -1,6 +1,5 @@
 package it.krzeminski
 
-import io.exoquery.pprint
 import it.krzeminski.internal.*
 import it.krzeminski.internal.String
 import kotlinx.io.*
@@ -9,9 +8,8 @@ import okio.Path.Companion.toPath
 import okio.buffer
 import okio.openZip
 
-fun readFirstClassFileFromJar(): ByteArray {
-    val zipFileSystem = FileSystem.SYSTEM
-        .openZip("test-module-to-inspect/build/libs/test-module-to-inspect.jar".toPath())
+fun readFirstClassFileFromJar(path: kotlin.String): ByteArray {
+    val zipFileSystem = FileSystem.SYSTEM.openZip(path.toPath())
     val classFilePath = zipFileSystem.list(".".toPath()).first { it.name.endsWith(".class") }
     return zipFileSystem.source(classFilePath).buffer().readByteArray()
 }
