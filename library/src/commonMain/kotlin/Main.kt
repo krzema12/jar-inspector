@@ -277,6 +277,7 @@ fun readArguments(infoBuffer: Buffer, constantPool: List<ConstantPoolStruct>): M
                                     // println("String: $string")
                                     add(string)
                                 }
+                                else -> error("Field descriptor $fieldDescriptor is not supported!")
                             }
                         }
                     })
