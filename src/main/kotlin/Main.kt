@@ -4,16 +4,25 @@ import io.exoquery.pprint
 import it.krzeminski.internal.*
 import it.krzeminski.internal.String
 import kotlinx.io.*
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
+import okio.FileSystem
+import okio.Path.Companion.toPath
+import okio.buffer
+import okio.openZip
 
 fun main() {
-    val classFileToRead = Path("test-module-to-inspect/build/classes/kotlin/main/SomeClass.class")
-    val source = SystemFileSystem.source(classFileToRead).buffered()
+    val firstClassFile: ByteArray = readFirstClassFileFromJar()
+    val source = Buffer().apply { write(firstClassFile) }
 
     val (bytecodeVersion, kotlinMetadataVersion) = readVersions(source)
      println("Bytecode version: $bytecodeVersion")
      println("Kotlin metadata version: $kotlinMetadataVersion")
+}
+
+fun readFirstClassFileFromJar(): ByteArray {
+    val zipFileSystem = FileSystem.SYSTEM
+        .openZip("test-module-to-inspect/build/libs/test-module-to-inspect.jar".toPath())
+    val classFilePath = zipFileSystem.list(".".toPath()).first { it.name.endsWith(".class") }
+    return zipFileSystem.source(classFilePath).buffer().readByteArray()
 }
 
 fun readVersions(source: Source): Pair<kotlin.String, kotlin.String> {
