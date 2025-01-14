@@ -3,4 +3,5 @@ plugins {
 }
 rootProject.name = "jar-inspector"
 
+include(":library")
 includeBuild("test-module-to-inspect")
