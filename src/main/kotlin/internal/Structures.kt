@@ -60,3 +60,16 @@ data class MethodInfo(
     val descriptorIndex: Int,
     val attributes: Map<kotlin.String, AttributeInfo>,
 )
+
+data class ParsedAttributeInfo(
+    val arguments: Map<kotlin.String, ArgumentInfo>,
+)
+
+sealed interface ArgumentInfo
+
+data class ArrayArg(
+    val items: List<Any>,
+) : ArgumentInfo
+
+data class IntArg(val value: Int) : ArgumentInfo
+

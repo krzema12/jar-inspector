@@ -16,33 +16,10 @@ fun main() {
 
     val runtimeVisibleAnnotations = classFile.attributes["RuntimeVisibleAnnotations"]!!
 
-    val infoBuffer = Buffer().apply { write(runtimeVisibleAnnotations.info) }
-    val noOfAnnotations = infoBuffer.readUShort().toInt()
-    println("Number of annotations: $noOfAnnotations")
-    val nameIndex = infoBuffer.readUShort().toInt()
-    println("Name: ${(classFile.constantPool[nameIndex - 1] as Utf8).string}")
-    val noOfArguments = infoBuffer.readUShort().toInt()
-    println("Number of arguments: $noOfArguments")
-
-    val argNameIndex = infoBuffer.readUShort().toInt()
-    println("Name: ${(classFile.constantPool[argNameIndex - 1] as Utf8).string}")
-    val fieldDescriptor1 = infoBuffer.readByte().toInt().toChar()
-    println("Field descriptor 1: $fieldDescriptor1")
-    val noOfArrayItems = infoBuffer.readUShort().toInt()
-    println("Number of array items: $noOfArrayItems")
-    val fieldDescriptor2 = infoBuffer.readByte().toInt().toChar()
-    println("Field descriptor 2: $fieldDescriptor2")
-    val arrayNameIndex1 = infoBuffer.readUShort().toInt()
-    println("Arg1: ${(classFile.constantPool[arrayNameIndex1 - 1] as Integer).value}")
-    val fieldDescriptor3 = infoBuffer.readByte().toInt().toChar()
-    println("Field descriptor 3: $fieldDescriptor3")
-    val arrayNameIndex2 = infoBuffer.readUShort().toInt()
-    println("Arg2: ${(classFile.constantPool[arrayNameIndex2 - 1] as Integer).value}")
-    val fieldDescriptor4 = infoBuffer.readByte().toInt().toChar()
-    println("Field descriptor 4: $fieldDescriptor4")
-    val arrayNameIndex3 = infoBuffer.readUShort().toInt()
-    println("Arg3: ${(classFile.constantPool[arrayNameIndex3 - 1] as Integer).value}")
+    val annotation = runtimeVisibleAnnotations.parse(classFile.constantPool)
+    println(pprint(annotation))
 }
+
 
 fun readClassFile(source: Source): ClassFile {
     // https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
@@ -235,4 +212,61 @@ fun readMethodInfo(source: Source, constantPool: List<ConstantPoolStruct>): Meth
         descriptorIndex = descriptorIndex,
         attributes = attributes,
     )
+}
+
+fun AttributeInfo.parse(constantPool: List<ConstantPoolStruct>): Map<kotlin.String, ParsedAttributeInfo> {
+    val infoBuffer = Buffer().apply { write(this@parse.info) }
+    val noOfAnnotations = infoBuffer.readUShort().toInt()
+    return buildMap {
+        repeat(noOfAnnotations) {
+            val nameIndex = infoBuffer.readUShort().toInt()
+            val name = (constantPool[nameIndex - 1] as Utf8).string
+            val arguments = readArguments(infoBuffer, constantPool)
+            val parsedAttributeInfo = ParsedAttributeInfo(
+                arguments = arguments,
+            )
+
+            put(name, parsedAttributeInfo)
+        }
+    }
+}
+
+fun readArguments(infoBuffer: Buffer, constantPool: List<ConstantPoolStruct>): Map<kotlin.String, ArgumentInfo> {
+    val noOfArguments = infoBuffer.readUShort().toInt()
+    println("No of arguments: $noOfArguments")
+    return buildMap {
+        repeat (noOfArguments) {
+            val argNameIndex = infoBuffer.readUShort().toInt()
+            val argName = (constantPool[argNameIndex - 1] as Utf8).string
+            println("Arg name: $argName")
+
+            val fieldDescriptor = infoBuffer.readByte().toInt().toChar()
+            when (fieldDescriptor) {
+                '[' -> {
+                    val noOfArrayItems = infoBuffer.readUShort().toInt()
+                    println("No of array items: $noOfArrayItems")
+                    val array = ArrayArg(items = buildList {
+                        repeat(noOfArrayItems) {
+                            val fieldDescriptor = infoBuffer.readByte().toInt().toChar()
+                            when (fieldDescriptor) {
+                                'I' -> {
+                                    val valueIndex = infoBuffer.readUShort().toInt()
+                                    val value = (constantPool[valueIndex - 1] as Integer).value
+                                    println("Value: $value")
+                                    add(value)
+                                }
+                            }
+                        }
+                    })
+                    put(argName, array)
+                }
+                'I' -> {
+                    val valueIndex = infoBuffer.readUShort().toInt()
+                    val value = (constantPool[valueIndex - 1] as Integer).value
+                    println("Value: $value")
+                    put(argName, IntArg(value = value))
+                }
+            }
+        }
+    }
 }
