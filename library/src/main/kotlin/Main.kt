@@ -9,15 +9,6 @@ import okio.Path.Companion.toPath
 import okio.buffer
 import okio.openZip
 
-fun main() {
-    val firstClassFile: ByteArray = readFirstClassFileFromJar()
-    val source = Buffer().apply { write(firstClassFile) }
-
-    val (bytecodeVersion, kotlinMetadataVersion) = readVersions(source)
-     println("Bytecode version: $bytecodeVersion")
-     println("Kotlin metadata version: $kotlinMetadataVersion")
-}
-
 fun readFirstClassFileFromJar(): ByteArray {
     val zipFileSystem = FileSystem.SYSTEM
         .openZip("test-module-to-inspect/build/libs/test-module-to-inspect.jar".toPath())
@@ -25,7 +16,8 @@ fun readFirstClassFileFromJar(): ByteArray {
     return zipFileSystem.source(classFilePath).buffer().readByteArray()
 }
 
-fun readVersions(source: Source): Pair<kotlin.String, kotlin.String> {
+fun readVersions(byteArray: ByteArray): Pair<kotlin.String, kotlin.String> {
+    val source = Buffer().apply { write(byteArray) }
     val classFile = readClassFile(source = source)
     // println(pprint(classFile, defaultHeight = 1000))
     val bytecodeVersion = "${classFile.majorVersion}.${classFile.minorVersion}"
