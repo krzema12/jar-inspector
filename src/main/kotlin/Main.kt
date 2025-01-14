@@ -11,13 +11,23 @@ fun main() {
     val classFileToRead = Path("test-module-to-inspect/build/classes/kotlin/main/SomeClass.class")
     val source = SystemFileSystem.source(classFileToRead).buffered()
 
+    val (bytecodeVersion, kotlinMetadataVersion) = readVersions(source)
+    println("Bytecode version: $bytecodeVersion")
+    println("Kotlin metadata version: $kotlinMetadataVersion")
+}
+
+fun readVersions(source: Source): Pair<kotlin.String, kotlin.String> {
     val classFile = readClassFile(source = source)
-    println(pprint(classFile, defaultHeight = 1000))
+//    println(pprint(classFile, defaultHeight = 1000))
+    val bytecodeVersion = "${classFile.majorVersion}.${classFile.minorVersion}"
 
     val runtimeVisibleAnnotations = classFile.attributes["RuntimeVisibleAnnotations"]!!
 
-    val annotation = runtimeVisibleAnnotations.parse(classFile.constantPool)
-    println(pprint(annotation))
+    val annotations = runtimeVisibleAnnotations.parse(classFile.constantPool)
+    val kotlinMetadataVersion = (annotations["Lkotlin/Metadata;"]?.arguments["mv"] as ArrayArg)
+        .items.joinToString(separator = ".")
+//    println(pprint(annotation))
+    return Pair(bytecodeVersion, kotlinMetadataVersion)
 }
 
 
