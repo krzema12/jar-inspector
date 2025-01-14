@@ -19,7 +19,8 @@ fun main() {
     } ?: error("Not found!")
 
     val infoBuffer = Buffer().apply { write(runtimeVisibleAnnotations.info) }
-    infoBuffer.readUShort() // Unknown
+    val noOfAnnotations = infoBuffer.readUShort().toInt()
+    println("Number of annotations: $noOfAnnotations")
     val nameIndex = infoBuffer.readUShort().toInt()
     println("Name: ${(classFile.constantPool[nameIndex - 1] as Utf8).string}")
     val noOfArguments = infoBuffer.readUShort().toInt()
@@ -27,16 +28,20 @@ fun main() {
 
     val argNameIndex = infoBuffer.readUShort().toInt()
     println("Name: ${(classFile.constantPool[argNameIndex - 1] as Utf8).string}")
-    infoBuffer.readByte() // Unknown
+    val fieldDescriptor1 = infoBuffer.readByte().toInt().toChar()
+    println("Field descriptor 1: $fieldDescriptor1")
     val noOfArrayItems = infoBuffer.readUShort().toInt()
     println("Number of array items: $noOfArrayItems")
-    infoBuffer.readByte() // Unknown
+    val fieldDescriptor2 = infoBuffer.readByte().toInt().toChar()
+    println("Field descriptor 2: $fieldDescriptor2")
     val arrayNameIndex1 = infoBuffer.readUShort().toInt()
     println("Arg1: ${(classFile.constantPool[arrayNameIndex1 - 1] as Integer).value}")
-    infoBuffer.readByte() // Unknown
+    val fieldDescriptor3 = infoBuffer.readByte().toInt().toChar()
+    println("Field descriptor 3: $fieldDescriptor3")
     val arrayNameIndex2 = infoBuffer.readUShort().toInt()
     println("Arg2: ${(classFile.constantPool[arrayNameIndex2 - 1] as Integer).value}")
-    infoBuffer.readByte() // Unknown
+    val fieldDescriptor4 = infoBuffer.readByte().toInt().toChar()
+    println("Field descriptor 4: $fieldDescriptor4")
     val arrayNameIndex3 = infoBuffer.readUShort().toInt()
     println("Arg3: ${(classFile.constantPool[arrayNameIndex3 - 1] as Integer).value}")
 }
