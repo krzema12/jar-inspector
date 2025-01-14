@@ -12,13 +12,13 @@ fun main() {
     val source = SystemFileSystem.source(classFileToRead).buffered()
 
     val (bytecodeVersion, kotlinMetadataVersion) = readVersions(source)
-    println("Bytecode version: $bytecodeVersion")
-    println("Kotlin metadata version: $kotlinMetadataVersion")
+     println("Bytecode version: $bytecodeVersion")
+     println("Kotlin metadata version: $kotlinMetadataVersion")
 }
 
 fun readVersions(source: Source): Pair<kotlin.String, kotlin.String> {
     val classFile = readClassFile(source = source)
-    println(pprint(classFile, defaultHeight = 1000))
+    // println(pprint(classFile, defaultHeight = 1000))
     val bytecodeVersion = "${classFile.majorVersion}.${classFile.minorVersion}"
 
     val runtimeVisibleAnnotations = classFile.attributes["RuntimeVisibleAnnotations"]!!
@@ -26,7 +26,7 @@ fun readVersions(source: Source): Pair<kotlin.String, kotlin.String> {
     val annotations = runtimeVisibleAnnotations.parse(classFile.constantPool)
     val kotlinMetadataVersion = (annotations["Lkotlin/Metadata;"]?.arguments["mv"] as ArrayArg)
         .items.joinToString(separator = ".")
-    println(pprint(annotations))
+    // println(pprint(annotations))
     return Pair(bytecodeVersion, kotlinMetadataVersion)
 }
 
@@ -243,34 +243,34 @@ fun AttributeInfo.parse(constantPool: List<ConstantPoolStruct>): Map<kotlin.Stri
 
 fun readArguments(infoBuffer: Buffer, constantPool: List<ConstantPoolStruct>): Map<kotlin.String, ArgumentInfo> {
     val noOfArguments = infoBuffer.readUShort().toInt()
-    println("No of arguments: $noOfArguments")
+    // println("No of arguments: $noOfArguments")
     return buildMap {
         repeat (noOfArguments) {
             val argNameIndex = infoBuffer.readUShort().toInt()
             val argName = (constantPool[argNameIndex - 1] as Utf8).string
-            println("Arg name: $argName")
+            // println("Arg name: $argName")
 
             val fieldDescriptor = infoBuffer.readByte().toInt().toChar()
             when (fieldDescriptor) {
                 '[' -> {
                     val noOfArrayItems = infoBuffer.readUShort().toInt()
-                    println("No of array items: $noOfArrayItems")
+                    // println("No of array items: $noOfArrayItems")
                     val array = ArrayArg(items = buildList {
                         repeat(noOfArrayItems) {
                             val fieldDescriptor = infoBuffer.readByte().toInt().toChar()
-                            println("Field descriptor: $fieldDescriptor")
+                            // println("Field descriptor: $fieldDescriptor")
                             when (fieldDescriptor) {
                                 'I' -> {
                                     val valueIndex = infoBuffer.readUShort().toInt()
                                     val value = (constantPool[valueIndex - 1] as Integer).value
-                                    println("Value: $value")
+                                    // println("Value: $value")
                                     add(value)
                                 }
                                 // I think a string?
                                 's' -> {
                                     val valueIndex = infoBuffer.readUShort().toInt()
                                     val string = (constantPool[valueIndex - 1] as Utf8).string
-                                    println("String: $string")
+                                    // println("String: $string")
                                     add(string)
                                 }
                             }
@@ -281,7 +281,7 @@ fun readArguments(infoBuffer: Buffer, constantPool: List<ConstantPoolStruct>): M
                 'I' -> {
                     val valueIndex = infoBuffer.readUShort().toInt()
                     val value = (constantPool[valueIndex - 1] as Integer).value
-                    println("Value: $value")
+                    // println("Value: $value")
                     put(argName, IntArg(value = value))
                 }
             }
