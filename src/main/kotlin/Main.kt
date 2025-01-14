@@ -227,7 +227,7 @@ fun readMethodInfo(source: Source, constantPool: List<ConstantPoolStruct>): Meth
 fun AttributeInfo.parse(constantPool: List<ConstantPoolStruct>): Map<kotlin.String, ParsedAttributeInfo> {
     val infoBuffer = Buffer().apply { write(this@parse.info) }
     val noOfAnnotations = infoBuffer.readUShort().toInt()
-    return buildMap {
+    val map = buildMap {
         repeat(noOfAnnotations) {
             val nameIndex = infoBuffer.readUShort().toInt()
             val name = (constantPool[nameIndex - 1] as Utf8).string
@@ -239,6 +239,10 @@ fun AttributeInfo.parse(constantPool: List<ConstantPoolStruct>): Map<kotlin.Stri
             put(name, parsedAttributeInfo)
         }
     }
+    require(infoBuffer.exhausted()) {
+        "There's still some data to read!"
+    }
+    return map
 }
 
 fun readArguments(infoBuffer: Buffer, constantPool: List<ConstantPoolStruct>): Map<kotlin.String, ArgumentInfo> {
