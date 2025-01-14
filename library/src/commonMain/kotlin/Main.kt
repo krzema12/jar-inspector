@@ -10,7 +10,8 @@ import okio.openZip
 
 fun readFirstClassFileFromJar(path: kotlin.String): ByteArray {
     val zipFileSystem = FileSystem.SYSTEM.openZip(path.toPath())
-    val classFilePath = zipFileSystem.list(".".toPath()).first { it.name.endsWith(".class") }
+    val classFilePath = zipFileSystem.listRecursively(".".toPath()).first { it.name.endsWith(".class") }
+    println("  Analyzed class file path: $classFilePath")
     return zipFileSystem.source(classFilePath).buffer().readByteArray()
 }
 
