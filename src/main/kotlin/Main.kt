@@ -14,9 +14,7 @@ fun main() {
     val classFile = readClassFile(source = source)
     println(pprint(classFile, defaultHeight = 1000))
 
-    val runtimeVisibleAnnotations = classFile.attributes.find { attribute ->
-        (classFile.constantPool[attribute.attributeNameIndex - 1] as Utf8).string == "RuntimeVisibleAnnotations"
-    } ?: error("Not found!")
+    val runtimeVisibleAnnotations = classFile.attributes["RuntimeVisibleAnnotations"]!!
 
     val infoBuffer = Buffer().apply { write(runtimeVisibleAnnotations.info) }
     val noOfAnnotations = infoBuffer.readUShort().toInt()
@@ -83,14 +81,16 @@ fun readClassFile(source: Source): ClassFile {
     val methodsCount = source.readUShort()
     val methods = buildList {
         repeat(methodsCount.toInt()) {
-            add(readMethodInfo(source))
+            add(readMethodInfo(source, constantPool))
         }
     }
 
     val attributesCount = source.readUShort()
-    val attributes = buildList {
+    val attributes = buildMap {
         repeat(attributesCount.toInt()) {
-            add(readAttributeInfo(source))
+            val attributeNameIndex = source.readUShort().toInt()
+            val name = (constantPool[attributeNameIndex - 1] as Utf8).string
+            put(name, readAttributeInfo(source))
         }
     }
 
@@ -210,23 +210,23 @@ private fun readFieldInfo(source: Source): FieldInfo {
 }
 
 fun readAttributeInfo(source: Source): AttributeInfo {
-    val attributeNameIndex = source.readUShort().toInt()
     val attributeLength = source.readUInt()
     val info = source.readByteArray(attributeLength.toInt())
     return AttributeInfo(
-        attributeNameIndex = attributeNameIndex,
         info = info,
     )
 }
 
-fun readMethodInfo(source: Source): MethodInfo {
+fun readMethodInfo(source: Source, constantPool: List<ConstantPoolStruct>): MethodInfo {
     val accessFlags = source.readUShort().toInt()
     val nameIndex = source.readUShort().toInt()
     val descriptorIndex = source.readUShort().toInt()
     val attributesCount = source.readUShort()
-    val attributes = buildList {
+    val attributes = buildMap {
         repeat(attributesCount.toInt()) {
-            add(readAttributeInfo(source))
+            val attributeNameIndex = source.readUShort().toInt()
+            val name = (constantPool[attributeNameIndex - 1] as Utf8).string
+            put(name, readAttributeInfo(source))
         }
     }
     return MethodInfo(

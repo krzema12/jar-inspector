@@ -10,7 +10,7 @@ data class ClassFile(
     val interfaces: List<UShort>,
     val fields: List<FieldInfo>,
     val methods: List<MethodInfo>,
-    val attributes: List<AttributeInfo>,
+    val attributes: Map<kotlin.String, AttributeInfo>,
 )
 
 sealed interface ConstantPoolStruct
@@ -51,7 +51,6 @@ data class FieldInfo(
 ) : ConstantPoolStruct
 
 data class AttributeInfo(
-    val attributeNameIndex: Int,
     val info: ByteArray,
 )
 
@@ -59,5 +58,5 @@ data class MethodInfo(
     val accessFlags: Int,
     val nameIndex: Int,
     val descriptorIndex: Int,
-    val attributes: List<AttributeInfo>,
+    val attributes: Map<kotlin.String, AttributeInfo>,
 )
