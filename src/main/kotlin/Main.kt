@@ -2,8 +2,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import it.krzeminski.readFirstClassFileFromJar
-import it.krzeminski.readVersions
 import okio.Path.Companion.toPath
 import okio.fakefilesystem.FakeFileSystem
 

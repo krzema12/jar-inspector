@@ -1,6 +1,3 @@
-package it.krzeminski
-
-import it.krzeminski.internal.*
 import okio.Buffer
 import okio.BufferedSource
 import okio.FileSystem
