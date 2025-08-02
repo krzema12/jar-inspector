@@ -21,13 +21,13 @@ fun readVersions(byteArray: ByteArray): Pair<kotlin.String, kotlin.String> {
     // println(pprint(classFile, defaultHeight = 1000))
     val bytecodeVersion = "${classFile.majorVersion}.${classFile.minorVersion}"
 
-    val runtimeVisibleAnnotations = classFile.attributes["RuntimeVisibleAnnotations"]!!
-
-    val annotations = runtimeVisibleAnnotations.parse(classFile.constantPool)
-    val kotlinMetadataVersion = (annotations["Lkotlin/Metadata;"]?.arguments["mv"] as ArrayArg)
-        .items.joinToString(separator = ".")
-    // println(pprint(annotations))
-    return Pair(bytecodeVersion, kotlinMetadataVersion)
+//    val runtimeVisibleAnnotations = classFile.attributes["RuntimeVisibleAnnotations"]!!
+//
+//    val annotations = runtimeVisibleAnnotations.parse(classFile.constantPool)
+//    val kotlinMetadataVersion = (annotations["Lkotlin/Metadata;"]?.arguments["mv"] as ArrayArg)
+//        .items.joinToString(separator = ".")
+//    // println(pprint(annotations))
+    return Pair(bytecodeVersion, "unknown")
 }
 
 

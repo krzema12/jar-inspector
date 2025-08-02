@@ -4,8 +4,8 @@ import java.io.FileOutputStream
 import java.net.URI
 
 fun main() {
-    val groupId = "io.github.typesafegithub"
-    val artifactId = "github-workflows-kt"
+    val groupId = "it.krzeminski"
+    val artifactId = "snakeyaml-engine-kmp-jvm"
     val pathToMavenMetadata = "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/maven-metadata.xml"
 
     val mavenMetadata = URI(pathToMavenMetadata).toURL().readText()
