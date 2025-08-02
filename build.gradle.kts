@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -11,7 +13,6 @@ repositories {
 kotlin {
     jvm()
 
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
         outputModuleName = "jarInspector"
@@ -29,6 +30,13 @@ kotlin {
                 implementation("com.squareup.okio:okio-fakefilesystem:3.10.2")
                 implementation("io.ktor:ktor-client-core:3.2.3")
                 implementation("io.ktor:ktor-client-cio:3.2.3")
+            }
+        }
+
+        val wasmJsMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3.1")
+                implementation(npm("pako", "2.1.0"))
             }
         }
     }

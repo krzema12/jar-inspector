@@ -19,8 +19,14 @@ suspend fun main() {
         println("Version: $version")
         val pathToJar = "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/$version/$artifactId-$version.jar"
         val jarResponse = httpClient.get(urlString = pathToJar) {}.body<ByteArray>()
-        val firstClassFile: ByteArray = readFirstClassFileFromJar(jarResponse)
-        val (bytecodeVersion, kotlinMetadataVersion) = readVersions(firstClassFile)
-        println("  Bytecode version: $bytecodeVersion")
+        try {
+            val firstClassFile: ByteArray = readFirstClassFileFromJar(jarResponse)
+            val (bytecodeVersion, kotlinMetadataVersion) = readVersions(firstClassFile)
+            println("  Bytecode version: $bytecodeVersion")
+        } catch (e: Throwable) {
+            println(e.message)
+            println(e.cause?.message)
+            e.printStackTrace()
+        }
     }
 }
