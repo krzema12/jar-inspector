@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
-    kotlin("multiplatform") version "2.1.0"
+    kotlin("multiplatform") version "2.2.0"
 }
 
 repositories {
@@ -8,6 +10,17 @@ repositories {
 
 kotlin {
     jvm()
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        binaries.executable()
+        outputModuleName = "jarInspector"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "jarInspector.js"
+            }
+        }
+    }
 
     sourceSets {
         commonMain {

@@ -1,16 +1,7 @@
 import okio.Buffer
 import okio.BufferedSource
-import okio.FileSystem
-import okio.Path.Companion.toPath
-import okio.buffer
-import okio.openZip
 
-fun readFirstClassFileFromJar(fileSystem: FileSystem): ByteArray {
-    val zipFileSystem = fileSystem.openZip("some-jar.jar".toPath())
-    val classFilePath = zipFileSystem.listRecursively(".".toPath()).first { it.name.endsWith(".class") }
-    println("  Analyzed class file path: $classFilePath")
-    return zipFileSystem.source(classFilePath).buffer().readByteArray()
-}
+expect fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray
 
 fun readVersions(byteArray: ByteArray): Pair<String, String> {
     val source = Buffer().apply { write(byteArray) }
