@@ -4,7 +4,8 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import it.krzeminski.readFirstClassFileFromJar
 import it.krzeminski.readVersions
-import java.io.File
+import okio.Path.Companion.toPath
+import okio.fakefilesystem.FakeFileSystem
 
 suspend fun main() {
     val groupId = "io.github.typesafegithub"
@@ -21,10 +22,14 @@ suspend fun main() {
     versions.forEach { version ->
         println("Version: $version")
         val pathToJar = "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/$version/$artifactId-$version.jar"
-        val localJarFile = System.getProperty("java.io.tmpdir") + version + ".jar"
         val jarResponse = httpClient.get(urlString = pathToJar) {}.body<ByteArray>()
-        File(localJarFile).writeBytes(jarResponse)
-        val firstClassFile: ByteArray = readFirstClassFileFromJar(localJarFile)
+        val fileSystem = FakeFileSystem()
+        fileSystem.apply {
+            write("/some-jar.jar".toPath()) {
+                write(jarResponse)
+            }
+        }
+        val firstClassFile: ByteArray = readFirstClassFileFromJar(fileSystem)
         val (bytecodeVersion, kotlinMetadataVersion) = readVersions(firstClassFile)
         println("  Bytecode version: $bytecodeVersion")
     }
