@@ -3,14 +3,14 @@ package it.krzeminski.internal
 data class ClassFile(
     val majorVersion: UShort,
     val minorVersion: UShort,
-    val constantPool: List<ConstantPoolStruct>,
-    val accessFlags: UShort,
-    val thisClass: UShort,
-    val superclass: UShort,
-    val interfaces: List<UShort>,
-    val fields: List<FieldInfo>,
-    val methods: List<MethodInfo>,
-    val attributes: Map<kotlin.String, AttributeInfo>,
+//    val constantPool: List<ConstantPoolStruct>,
+//    val accessFlags: UShort,
+//    val thisClass: UShort,
+//    val superclass: UShort,
+//    val interfaces: List<UShort>,
+//    val fields: List<FieldInfo>,
+//    val methods: List<MethodInfo>,
+//    val attributes: Map<kotlin.String, AttributeInfo>,
 )
 
 sealed interface ConstantPoolStruct

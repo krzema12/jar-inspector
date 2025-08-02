@@ -39,63 +39,63 @@ fun readClassFile(source: Source): ClassFile {
     val minorVersion = source.readUShort()
     val majorVersion = source.readUShort()
 
-    val constantPoolCount = source.readUShort()
-
-    val constantPool = buildList {
-        repeat(constantPoolCount.toInt() - 1) {
-            add(readConstantPoolEntry(source))
-        }
-    }
-
-    val accessFlags = source.readUShort()
-    val thisClass = source.readUShort()
-    val superclass = source.readUShort()
-
-    val interfacesCount = source.readUShort()
-    val interfaces = buildList {
-        repeat(interfacesCount.toInt()) {
-            add(source.readUShort())
-        }
-    }
-
-    val fieldsCount = source.readUShort()
-    val fields = buildList {
-        repeat(fieldsCount.toInt()) {
-            add(readFieldInfo(source))
-        }
-    }
-
-    val methodsCount = source.readUShort()
-    val methods = buildList {
-        repeat(methodsCount.toInt()) {
-            add(readMethodInfo(source, constantPool))
-        }
-    }
-
-    val attributesCount = source.readUShort()
-    val attributes = buildMap {
-        repeat(attributesCount.toInt()) {
-            val attributeNameIndex = source.readUShort().toInt()
-            val name = (constantPool[attributeNameIndex - 1] as Utf8).string
-            put(name, readAttributeInfo(source))
-        }
-    }
-
-    require(source.exhausted()) {
-        "There's still some data to read!"
-    }
+//    val constantPoolCount = source.readUShort()
+//
+//    val constantPool = buildList {
+//        repeat(constantPoolCount.toInt() - 1) {
+//            add(readConstantPoolEntry(source))
+//        }
+//    }
+//
+//    val accessFlags = source.readUShort()
+//    val thisClass = source.readUShort()
+//    val superclass = source.readUShort()
+//
+//    val interfacesCount = source.readUShort()
+//    val interfaces = buildList {
+//        repeat(interfacesCount.toInt()) {
+//            add(source.readUShort())
+//        }
+//    }
+//
+//    val fieldsCount = source.readUShort()
+//    val fields = buildList {
+//        repeat(fieldsCount.toInt()) {
+//            add(readFieldInfo(source))
+//        }
+//    }
+//
+//    val methodsCount = source.readUShort()
+//    val methods = buildList {
+//        repeat(methodsCount.toInt()) {
+//            add(readMethodInfo(source, constantPool))
+//        }
+//    }
+//
+//    val attributesCount = source.readUShort()
+//    val attributes = buildMap {
+//        repeat(attributesCount.toInt()) {
+//            val attributeNameIndex = source.readUShort().toInt()
+//            val name = (constantPool[attributeNameIndex - 1] as Utf8).string
+//            put(name, readAttributeInfo(source))
+//        }
+//    }
+//
+//    require(source.exhausted()) {
+//        "There's still some data to read!"
+//    }
 
     return ClassFile(
         majorVersion = majorVersion,
         minorVersion = minorVersion,
-        constantPool = constantPool,
-        accessFlags = accessFlags,
-        thisClass = thisClass,
-        superclass = superclass,
-        interfaces = interfaces,
-        fields = fields,
-        methods = methods,
-        attributes = attributes,
+//        constantPool = constantPool,
+//        accessFlags = accessFlags,
+//        thisClass = thisClass,
+//        superclass = superclass,
+//        interfaces = interfaces,
+//        fields = fields,
+//        methods = methods,
+//        attributes = attributes,
     )
 }
 

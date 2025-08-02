@@ -4,8 +4,8 @@ import java.io.FileOutputStream
 import java.net.URI
 
 fun main() {
-    val groupId = "it.krzeminski"
-    val artifactId = "snakeyaml-engine-kmp-jvm"
+    val groupId = "io.github.typesafegithub"
+    val artifactId = "github-workflows-kt"
     val pathToMavenMetadata = "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/maven-metadata.xml"
 
     val mavenMetadata = URI(pathToMavenMetadata).toURL().readText()
@@ -24,6 +24,5 @@ fun main() {
         val firstClassFile: ByteArray = readFirstClassFileFromJar(localJarFile)
         val (bytecodeVersion, kotlinMetadataVersion) = readVersions(firstClassFile)
         println("  Bytecode version: $bytecodeVersion")
-        println("  Kotlin metadata version: $kotlinMetadataVersion")
     }
 }
