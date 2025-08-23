@@ -3,7 +3,7 @@ import okio.buffer
 import okio.fakefilesystem.FakeFileSystem
 import okio.openZip
 
-actual fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray {
+actual suspend fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray {
     val fileSystem = FakeFileSystem()
     fileSystem.apply {
         write("/some-jar.jar".toPath()) {

@@ -1,7 +1,7 @@
 import okio.Buffer
 import okio.BufferedSource
 
-expect fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray
+expect suspend fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray
 
 fun readVersions(byteArray: ByteArray): Pair<String, String> {
     val source = Buffer().apply { write(byteArray) }
