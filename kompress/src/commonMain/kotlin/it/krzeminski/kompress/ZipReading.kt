@@ -31,6 +31,8 @@ fun readZip(byteArray: ByteArray): Byte {
     val bufferForReadingCentral = buffer.copy()
     bufferForReadingCentral.skip(offsetOfStartOfCentralDirectory.toLong())
 
+    val fileNameToLocalHeaderOffset = mutableMapOf<String, Int>()
+
     repeat(numberOfCentralDirectoryRecordsOnThisDisk.toInt()) {
         println("============ NEW CENTARL DIR ENTRY ==============")
         val magicNumberCentral = bufferForReadingCentral.readInt()
@@ -73,6 +75,20 @@ fun readZip(byteArray: ByteArray): Byte {
         println("Extra field: $extraField")
         val fileComment = bufferForReadingCentral.readUtf8(fileCommentLength.toLong())
         println("File comment: $fileComment")
+
+        fileNameToLocalHeaderOffset[fileName] = offsetOfLocalHeader
+    }
+
+    fileNameToLocalHeaderOffset.forEach { (fileName, offsetOfLocalHeader) ->
+        println("### Reading $fileName at position $offsetOfLocalHeader...")
+        val bufferForReadingFile = buffer.copy()
+        val magicNumber = bufferForReadingFile.readInt()
+        println("Magic number: ${magicNumber.toHexString()}")
+        bufferForReadingFile.skip(22) // Local header - we don't rely on it, we use only the central dir.
+        val fileNameLength = bufferForReadingFile.readShortLe()
+        println("File name length: $fileNameLength")
+        val fileName = bufferForReadingFile.readUtf8(fileNameLength.toLong())
+        println("File name: $fileName")
     }
 
     return buffer.readByte()
