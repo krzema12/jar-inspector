@@ -17,4 +17,18 @@ class ZipReadingTest : FunSpec({
         // TODO: return a list of files, and assert on something meaningful
         actual == 0x50.toByte()
     }
+
+    test("library JAR") {
+        // Given
+        val testZipInputStream: InputStream = this::class.java.classLoader.getResourceAsStream("snakeyaml-engine-kmp-jvm-3.2.0.jar")!!
+        val bytes = testZipInputStream.readAllBytes()
+        testZipInputStream.close()
+
+        // When
+        val actual = readZip(bytes)
+
+        // Then
+        // TODO: return a list of files, and assert on something meaningful
+        actual == 0x50.toByte()
+    }
 })
