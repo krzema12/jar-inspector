@@ -1,6 +1,7 @@
 package it.krzeminski.kompress
 
 import okio.Buffer
+import kotlin.math.PI
 
 data class FileProps(
     val offset: Int,
@@ -90,6 +91,7 @@ fun readZip(byteArray: ByteArray): Byte {
     }
 
     fileNameToLocalHeaderOffset.forEach { (fileName, fileProps) ->
+        println("")
         println("### Reading $fileName at position ${fileProps.offset} - compression method: ${fileProps.compressionMethod}...")
         val bufferForReadingFile = buffer.copy()
         bufferForReadingFile.skip(fileProps.offset.toLong())
@@ -103,8 +105,19 @@ fun readZip(byteArray: ByteArray): Byte {
         val fileName = bufferForReadingFile.readUtf8(fileNameLength.toLong())
         println("File name: $fileName")
         bufferForReadingFile.skip(localExtraFieldsLength.toLong())
-        val fileData = bufferForReadingFile.readByteArray(fileProps.compressedSize.toLong())
-        println("File data: $fileData")
+
+        println("Compressed size: ${fileProps.compressedSize}")
+        if (fileProps.compressedSize != 0) {
+            val fileData = bufferForReadingFile.readByteArray(fileProps.compressedSize.toLong())
+            println("Compression method: ${fileProps.compressionMethod}")
+            if (fileProps.compressionMethod == 0.toShort()) {
+                println("File data: ${String(fileData)}")
+            } else {
+                println("File data: ENCODED (TODO)")
+            }
+        } else {
+            println("0 size of compressed data")
+        }
     }
 
     return buffer.readByte()
