@@ -2,6 +2,12 @@ package it.krzeminski.kompress
 
 import okio.Buffer
 
+data class FileProps(
+    val offset: Int,
+    val compressionMethod: Short,
+    val compressedSize: Int,
+)
+
 fun readZip(byteArray: ByteArray): Byte {
     val buffer = Buffer().apply { write(byteArray) }
     val bufferForReadingEndOfCentral = buffer.copy()
@@ -31,7 +37,7 @@ fun readZip(byteArray: ByteArray): Byte {
     val bufferForReadingCentral = buffer.copy()
     bufferForReadingCentral.skip(offsetOfStartOfCentralDirectory.toLong())
 
-    val fileNameToLocalHeaderOffset = mutableMapOf<String, Int>()
+    val fileNameToLocalHeaderOffset = mutableMapOf<String, FileProps>()
 
     repeat(numberOfCentralDirectoryRecordsOnThisDisk.toInt()) {
         println("============ NEW CENTARL DIR ENTRY ==============")
@@ -76,19 +82,29 @@ fun readZip(byteArray: ByteArray): Byte {
         val fileComment = bufferForReadingCentral.readUtf8(fileCommentLength.toLong())
         println("File comment: $fileComment")
 
-        fileNameToLocalHeaderOffset[fileName] = offsetOfLocalHeader
+        fileNameToLocalHeaderOffset[fileName] = FileProps(
+            offset = offsetOfLocalHeader,
+            compressionMethod = compressionMethod,
+            compressedSize = compressedSize,
+        )
     }
 
-    fileNameToLocalHeaderOffset.forEach { (fileName, offsetOfLocalHeader) ->
-        println("### Reading $fileName at position $offsetOfLocalHeader...")
+    fileNameToLocalHeaderOffset.forEach { (fileName, fileProps) ->
+        println("### Reading $fileName at position ${fileProps.offset} - compression method: ${fileProps.compressionMethod}...")
         val bufferForReadingFile = buffer.copy()
+        bufferForReadingFile.skip(fileProps.offset.toLong())
         val magicNumber = bufferForReadingFile.readInt()
         println("Magic number: ${magicNumber.toHexString()}")
         bufferForReadingFile.skip(22) // Local header - we don't rely on it, we use only the central dir.
         val fileNameLength = bufferForReadingFile.readShortLe()
         println("File name length: $fileNameLength")
+        val localExtraFieldsLength = bufferForReadingFile.readShortLe()
+        println("Local extra fields length: $localExtraFieldsLength")
         val fileName = bufferForReadingFile.readUtf8(fileNameLength.toLong())
         println("File name: $fileName")
+        bufferForReadingFile.skip(localExtraFieldsLength.toLong())
+        val fileData = bufferForReadingFile.readByteArray(fileProps.compressedSize.toLong())
+        println("File data: $fileData")
     }
 
     return buffer.readByte()
