@@ -1,7 +1,13 @@
+import it.krzeminski.kompress.readZip
 import okio.Buffer
 import okio.BufferedSource
 
-expect fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray
+fun readFirstClassFileFromJar(byteArray: ByteArray): ByteArray {
+    val filePathToContents = readZip(byteArray)
+    return filePathToContents.entries
+        .first { (key, _) -> key.endsWith(".class") }
+        .value
+}
 
 fun readVersions(byteArray: ByteArray): Pair<String, String> {
     val source = Buffer().apply { write(byteArray) }
