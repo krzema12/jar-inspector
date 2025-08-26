@@ -2,6 +2,7 @@ package it.krzeminski.kompress
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
+import io.kotest.engine.names.WithDataTestName
 import io.kotest.matchers.shouldBe
 import java.util.zip.Deflater
 import java.io.ByteArrayOutputStream
@@ -9,8 +10,8 @@ import java.io.ByteArrayOutputStream
 class InflateTestCase(
     val name: String,
     val originalData: ByteArray
-) {
-    override fun toString(): String = name
+) : WithDataTestName {
+    override fun dataTestName(): String = name
 }
 
 class InflatingTest : FunSpec({
