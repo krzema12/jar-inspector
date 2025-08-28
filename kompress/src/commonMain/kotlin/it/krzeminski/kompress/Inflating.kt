@@ -223,24 +223,7 @@ fun inflate(data: ByteArray): ByteArray {
         return byteArrayOf()
     }
 
-    // Parse ZLIB header (2 bytes)
-    if (data.size < 2) {
-        error("Invalid DEFLATE data: too short")
-    }
-
-    val cmf = data[0].toInt() and 0xFF
-    val flg = data[1].toInt() and 0xFF
-
-    // Verify ZLIB header
-    val compressionMethod = cmf and 0x0F
-    if (compressionMethod != 8) {
-        error("Unsupported compression method: $compressionMethod")
-    }
-
-    // Skip ZLIB header and checksum (2 bytes at start, 4 bytes at end)
-    val deflateData = data.sliceArray(2 until data.size - 4)
-
-    val bitReader = BitReader(deflateData)
+    val bitReader = BitReader(data)
     val output = mutableListOf<Byte>()
 
     var lastBlock = false

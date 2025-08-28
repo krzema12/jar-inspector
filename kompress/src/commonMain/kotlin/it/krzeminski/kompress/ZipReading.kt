@@ -115,7 +115,7 @@ fun readZip(byteArray: ByteArray): Map<String, ByteArray> {
                 fileToContents[fileName] = fileData
 //                println("File data: ${String(fileData)}")
             } else {
-                fileToContents[fileName] = inflateWithJdk(fileData)
+                fileToContents[fileName] = inflate(fileData)
 //                println("File data: ENCODED")
             }
         } else {
