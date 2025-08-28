@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform") version "2.2.10"
     id("io.kotest") version "6.0.0"
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
 }
 
 repositories {
@@ -14,6 +15,12 @@ kotlin {
                 useJUnitPlatform()
             }
         }
+    }
+
+    wasmJs {
+        binaries.library()
+        browser()
+        nodejs()
     }
 
     sourceSets {
