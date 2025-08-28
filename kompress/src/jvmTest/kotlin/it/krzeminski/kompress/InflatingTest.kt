@@ -5,7 +5,6 @@ import io.kotest.datatest.withData
 import io.kotest.engine.names.WithDataTestName
 import io.kotest.matchers.shouldBe
 import java.util.zip.Deflater
-import java.util.zip.Inflater
 import java.io.ByteArrayOutputStream
 
 class InflateTestCase(
@@ -95,27 +94,5 @@ private fun deflateWithJdk(input: ByteArray): ByteArray {
     }
 
     deflater.end()
-    return outputStream.toByteArray()
-}
-
-private fun inflateWithJdk(input: ByteArray): ByteArray {
-    val inflater = Inflater()
-    inflater.setInput(input)
-
-    val outputStream = ByteArrayOutputStream()
-    val buffer = ByteArray(1024)
-
-    try {
-        while (!inflater.finished()) {
-            val count = inflater.inflate(buffer)
-            if (count == 0) {
-                break
-            }
-            outputStream.write(buffer, 0, count)
-        }
-    } finally {
-        inflater.end()
-    }
-
     return outputStream.toByteArray()
 }

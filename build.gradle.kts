@@ -13,16 +13,16 @@ repositories {
 kotlin {
     jvm()
 
-    wasmJs {
-        binaries.executable()
-        outputModuleName = "jarInspector"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "jarInspector.js"
-            }
-        }
-    }
-
+//    wasmJs {
+//        binaries.executable()
+//        outputModuleName = "jarInspector"
+//        browser {
+//            commonWebpackConfig {
+//                outputFileName = "jarInspector.js"
+//            }
+//        }
+//    }
+//
     sourceSets {
         commonMain {
             dependencies {
@@ -34,11 +34,11 @@ kotlin {
             }
         }
 
-        val wasmJsMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3.1")
-                implementation(npm("pako", "2.1.0"))
-            }
-        }
+//        val wasmJsMain by getting {
+//            dependencies {
+//                implementation("org.jetbrains.kotlinx:kotlinx-browser:0.3.1")
+//                implementation(npm("pako", "2.1.0"))
+//            }
+//        }
     }
 }

@@ -288,7 +288,7 @@ fun inflate(data: ByteArray): ByteArray {
             2 -> { // Dynamic Huffman
                 // Read header
                 val hlit = bitReader.readBits(5) + 257  // number of literal/length codes
-                val hdist = bitReader.readBits(5) + 1   // number of distance codes  
+                val hdist = bitReader.readBits(5) + 1   // number of distance codes
                 val hclen = bitReader.readBits(4) + 4   // number of code length codes
 
                 // Code length alphabet order (permuted)
