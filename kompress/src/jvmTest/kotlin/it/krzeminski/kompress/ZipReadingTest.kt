@@ -1,6 +1,8 @@
 package it.krzeminski.kompress
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.maps.shouldContainKey
+import io.kotest.matchers.shouldBe
 import java.io.InputStream
 
 class ZipReadingTest : FunSpec({
@@ -14,8 +16,12 @@ class ZipReadingTest : FunSpec({
         val actual = readZip(bytes)
 
         // Then
-        // TODO: return a list of files, and assert on something meaningful
-        actual == 0x50.toByte()
+        actual shouldBe mapOf(
+            "test-dir/" to emptyArray<Byte>(),
+            "test-dir/some-file1.txt" to "Some contents!\n".toByteArray(),
+            "test-dir/another-dir/" to emptyArray<Byte>(),
+            "test-dir/another-dir/some-file2.txt" to "Another contents?\n".toByteArray()
+        )
     }
 
     test("library JAR") {
@@ -28,7 +34,6 @@ class ZipReadingTest : FunSpec({
         val actual = readZip(bytes)
 
         // Then
-        // TODO: return a list of files, and assert on something meaningful
-        actual == 0x50.toByte()
+        actual shouldContainKey "ble"
     }
 })
