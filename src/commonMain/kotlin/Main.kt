@@ -4,8 +4,8 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 
 suspend fun main() {
-    val groupId = "io.github.typesafegithub"
-    val artifactId = "github-workflows-kt"
+    val groupId = "com.google.guava"
+    val artifactId = "guava"
     val pathToMavenMetadata = "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/maven-metadata.xml"
 
     val httpClient = HttpClient()
@@ -18,6 +18,7 @@ suspend fun main() {
     versions.forEach { version ->
         println("Version: $version")
         val pathToJar = "https://repo1.maven.org/maven2/${groupId.replace(".", "/")}/$artifactId/$version/$artifactId-$version.jar"
+        println("  URL: $pathToJar")
         val jarResponse = httpClient.get(urlString = pathToJar) {}.body<ByteArray>()
         try {
             val firstClassFile: ByteArray = readFirstClassFileFromJar(jarResponse)
