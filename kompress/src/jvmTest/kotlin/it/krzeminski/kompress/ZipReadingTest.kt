@@ -3,6 +3,7 @@ package it.krzeminski.kompress
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
+import okio.Buffer
 import java.io.InputStream
 
 class ZipReadingTest : FunSpec({
@@ -34,6 +35,15 @@ class ZipReadingTest : FunSpec({
         val actual = readZip(bytes)
 
         // Then
-        actual shouldContainKey "ble"
+        actual shouldContainKey "it/krzeminski/snakeyaml/engine/kmp/api/ConstructNode.class"
+        val classFileData = actual["it/krzeminski/snakeyaml/engine/kmp/api/ConstructNode.class"]
+
+        val source = Buffer().apply { write(classFileData!!) }
+        val magic = source.readInt()
+        magic.toUInt() shouldBe 0xCAFEBABE.toUInt()
+        val minorVersion = source.readShort()
+        val majorVersion = source.readShort()
+        majorVersion shouldBe 52
+        minorVersion shouldBe 0
     }
 })

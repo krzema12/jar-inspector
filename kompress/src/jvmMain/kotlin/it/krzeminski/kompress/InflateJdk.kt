@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.util.zip.Inflater
 
 actual fun inflateWithJdk(data: ByteArray): ByteArray {
-    val inflater = Inflater()
+    val inflater = Inflater(true)
     inflater.setInput(data)
 
     val outputStream = ByteArrayOutputStream()
